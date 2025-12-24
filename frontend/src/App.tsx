@@ -13,12 +13,18 @@ interface SiteStatus {
 function App() {
     const [sites, setSites] = useState<SiteStatus[]>([]);
     const [loading, setLoading] = useState(false);
+    const [lastCheckTime, setLastCheckTime] = useState(0);
 
     async function checkSites() {
-        if (loading) return;
+        // debounce: previne cliques múltiplos em menos de 2 segundos
+        const now = Date.now();
+        if (loading || (now - lastCheckTime < 2000)) {
+            return;
+        }
 
         setLoading(true);
         setSites([]);
+        setLastCheckTime(now);
 
         try {
             const results = await CheckSites();
